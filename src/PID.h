@@ -1,5 +1,7 @@
 #ifndef PID_H
 #define PID_H
+#include <iostream>
+#include <cmath>
 
 class PID {
  public:
@@ -38,6 +40,22 @@ class PID {
   double p_error;
   double i_error;
   double d_error;
+
+  int count;
+  int max_count;
+  double error;
+  double best_error;
+  double rmse;
+
+  double tolerance;
+  bool udpate_ready;
+  bool init;
+  bool second_check;
+  int iterations;
+
+  double PID_parameters[3];
+  double dParameters[3];
+  int dp_count;
 
   /**
    * PID Coefficients
