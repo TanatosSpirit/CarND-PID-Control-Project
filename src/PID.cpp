@@ -20,13 +20,13 @@ void PID::Init(double Kp_, double Ki_, double Kd_) {
   PID_parameters[1] = Ki_;
   PID_parameters[2] = Kd_;
 
-  dParameters[0] = 0.1;
-  dParameters[1] = 0.001;
-  dParameters[2] = 1.0;
+  dParameters[0] = Kp_ * 0.1;
+  dParameters[1] = Ki_ * 0.1;
+  dParameters[2] = Kd_ * 0.1;
 
   p_error = 0.0;
   count = 1;
-  max_count = 250;
+  max_count = 1500;
   error = 0.0;
   best_error = 0.0;
   rmse = 0.0;
@@ -44,6 +44,7 @@ void PID::UpdateError(double cte) {
    * TODO: Update PID errors based on cte.
    */
 
+  static std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
   // Error update
   d_error = cte - p_error;
 
@@ -65,13 +66,19 @@ void PID::UpdateError(double cte) {
       udpate_ready = true;
     } else{
       best_error = rmse;
-      std::cout << "Init best_error: " << best_error << std::endl;
+//      std::cout << "Init best_error: " << best_error << std::endl;
       PID_parameters[dp_count] += dParameters[dp_count];
     }
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+    std::cout << "Time difference = "
+              << static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count())/1000.0
+              << " s" << std::endl;
     std::cout << "RMSE: " << rmse << "  sum_dp: " << sum_dp << std::endl;
     std::cout << "Kp: " << PID_parameters[0] << " Ki: " << PID_parameters[1] << " Kd: " << PID_parameters[2] << std::endl;
     std::cout << "dP: " << dParameters[0] << " dI: " << dParameters[1] << " dD: " << dParameters[2] << std::endl;
     init = true;
+    begin = end;
   }
 
 
@@ -126,7 +133,7 @@ double PID::TotalError() {
   /**
    * TODO: Calculate and return the total error
    */
-//  return -Kp * p_error - Kd * d_error - Ki * i_error;  // TODO: Add your total error calc here!
-  double total_control = -PID_parameters[0] * p_error - PID_parameters[2] * d_error - PID_parameters[1] * i_error;
-  return total_control;
+  // TODO: Add your total error calc here!
+  
+  return -PID_parameters[0] * p_error - PID_parameters[2] * d_error - PID_parameters[1] * i_error;
 }
