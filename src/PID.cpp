@@ -56,6 +56,8 @@ void PID::UpdateError(double cte) {
 
   double sum_dp = dParameters[0] + dParameters[1] + dParameters[2];
 
+  // Twiddle algortihm
+
   if(count > max_count)
   {
     rmse = error / static_cast<double>(count);

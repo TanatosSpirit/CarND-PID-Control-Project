@@ -3,6 +3,65 @@ Self-Driving Car Engineer Nanodegree Program
 
 ---
 
+The goals / steps of this project are the following:
+
+Create a PID control algorithm to guide a vehicle around a track.
+Tune PID hyperparameters so the vehicle smoothly follows the road, minimizing the cross-track error.
+Implement a twiddle algorithm to continuously tune the hyper parameters.
+
+## Project Introduction
+This project implements a PID controller with twiddle optimization of the PID hyperparameters. 
+The PID control algorithm runs based on the cross-track error (CTE), provided by the simulator, 
+which is calculated using the vehicle's distance from the center of the lane. 
+The CTE is then used in a series of formulas to calculate the proportional (P), 
+integral (I) and derivative (D) values which together can be used to calculate the total error, alpha. Ultimately, 
+the total error is used as a steering angle and throttle measurement that corrects the vehicle's position and speed 
+until it reaches the center of the lane and maximum acceleration. The equation for total error (alpha) is shown below.
+
+![img](./img/Screenshot%20from%202022-04-09%2013-59-45.png)
+
+The first term (-taup * CTE) is the proportional component that allows the system to minimize the CTE, 
+but it always overshoots the target resulting in an oscillation around the target. The second term 
+(-taud * derivative of CTE) is the derivative term that counteracts the oscillation from P. 
+Finally the third term (-taui * sum_CTE) is the integral term that corrects for the system if the PID controller 
+is running parallel, but not equal to, the target.
+
+## Hyperparameter Tuning
+This section discusses how the hyperparameters, also known as tau, were chosen for each term P, I and D. When manual 
+tuning a hyperparameter, sequentially tuning P, I and D keeping the previous setting.
+
+**P** - This was tuned by staring at a small value and gradually increasing until the vehicle began swerving back and 
+forth, showing the oscillation of the P term. I chose 0.2 for the steering PID.
+
+**I** - This value was largely unused because after tuning P and D, the vehicle stayed in the center of the lane. 
+I chose a value of 0.001 in the steering PID to minimize I's influence while still allowing for improvement through 
+twiddle as the vehicle is driving.
+
+**D** - This was tuned with the P value set, then I increased the D value until the oscillation stoped. 
+I chose 2.0 for the steering PID to ensure a smooth ride.
+
+## Twiddle
+The twiddle algorithm continuously tunes the PID controller's hyperparameters by analyzing the cross-track error and 
+keeping track of the smallest CTE. If the vehicle starts to veer and the CTE increases, the twiddle algorithm will 
+incrementally increase or decrease the hyperparameters until the CTE is minimized.
+
+## Speed control
+Added main.cpp a speed limiter depending on the steering wheel angle in `main.cpp`. I chose 0.4 for the gas pedal 
+and then subtracted the steering angle value times 0.3.
+
+## Final PID settings
+The car drove in the simulation for about 3 hours, and the following parameters were found using the Twiddle algorithm:  
+**P** = 0.317452  
+**I** = 0.00105314  
+**D** = 2.82601  
+These values have been added to `main.cpp`.
+
+## Results
+
+![gif](./img/example.gif)
+
+Full video: https://youtu.be/tqUNd39fuNs
+
 ## Dependencies
 
 * cmake >= 3.5
